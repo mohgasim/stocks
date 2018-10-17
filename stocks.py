@@ -66,39 +66,44 @@ class TickerListIEX():
 
 class StockAV():
 
-	def __init__(self, ticker, start = None, end = datetime.today().strftime('%Y-%m-%d'), key = 'XUPW4RL3WF2RVXFY'):
+	def __init__(self, ticker, start = None, end = datetime.today().strftime('%Y-%m-%d'), key = None):
 
-		self.ticker = ticker.upper()
-		self.start = start
-		self.end = end
 		self.key = key
-		print(f'\nCollecting {self.ticker} data from Aplha Vantage.....')
-		ts = TimeSeries(key = self.key, output_format = 'pandas')
-		x, meta = ts.get_daily_adjusted(self.ticker, outputsize = 'full')
-		print(f'Data collection complete.')
-		print(f'Organizing data.....')
-		x.columns = ['open', 'high', 'low', 'close', 'adj_close', 'volume', 'dividend_amount', 'split_coef']
-		self.data 		= x[self.start:self.end]
-		self.open 		= self.data.open
-		self.high 		= self.data.high
-		self.low 		= self.data.low
-		self.close 		= self.data.close
-		self.adj_close 	= self.data.adj_close
-		self.holding_period = len(self.data)
-		self.holding_return = (self.adj_close[-1] / self.adj_close[0]) - 1
-		self.volume 	= self.data.volume
-		self.dividends 	= self.data.dividend_amount
-		self.split_coef = self.data.split_coef
-		self.meta		= meta
-		self.annual_return = ((self.adj_close/self.adj_close.shift(1)) - 1).mean()*250
-		self.return_volatility = (((self.adj_close/self.adj_close.shift(1)) - 1).std())*(250**0.5)
-		self.return_per_unit_vol = self.annual_return/self.return_volatility
-		self.adjustments = self.data[(self.data['dividend_amount'] != 0) | (self.data['split_coef'] != 1)]
+		if self.key == None:
+			print("You must obtain a key to use Alpha Vantage.")
+			print('Visit https://www.alphavantage.co/ to claim a free key.')
+			print('Then insert your key as a string attribute.')
+		else:
+			self.ticker = ticker.upper()
+			self.start = start
+			self.end = end
+			print(f'\nCollecting {self.ticker} data from Aplha Vantage.....')
+			ts = TimeSeries(key = self.key, output_format = 'pandas')
+			x, meta = ts.get_daily_adjusted(self.ticker, outputsize = 'full')
+			print(f'Data collection complete.')
+			print(f'Organizing data.....')
+			x.columns = ['open', 'high', 'low', 'close', 'adj_close', 'volume', 'dividend_amount', 'split_coef']
+			self.data 		= x[self.start:self.end]
+			self.open 		= self.data.open
+			self.high 		= self.data.high
+			self.low 		= self.data.low
+			self.close 		= self.data.close
+			self.adj_close 	= self.data.adj_close
+			self.holding_period = len(self.data)
+			self.holding_return = (self.adj_close[-1] / self.adj_close[0]) - 1
+			self.volume 	= self.data.volume
+			self.dividends 	= self.data.dividend_amount
+			self.split_coef = self.data.split_coef
+			self.meta		= meta
+			self.annual_return = ((self.adj_close/self.adj_close.shift(1)) - 1).mean()*250
+			self.return_volatility = (((self.adj_close/self.adj_close.shift(1)) - 1).std())*(250**0.5)
+			self.return_per_unit_vol = self.annual_return/self.return_volatility
+			self.adjustments = self.data[(self.data['dividend_amount'] != 0) | (self.data['split_coef'] != 1)]
 
-		if self.start == None:
-			self.start = self.data.index[0]
+			if self.start == None:
+				self.start = self.data.index[0]
 
-		print(f'Data organization complete.')
+			print(f'Data organization complete.')
 
 	def summary(self):
 		print(self.ticker)
@@ -187,3 +192,5 @@ class TickerListAV():
 if __name__ == '__main__':
 	print('This is a module and should be imported into another script.')
 	print('By Mohammed Gasim.')
+	x = StockAV('tsla', key = 'XUPW4RL3WF2RVXFY')
+	print(x.by_year())
