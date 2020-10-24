@@ -192,5 +192,3 @@ class TickerListAV():
 if __name__ == '__main__':
 	print('This is a module and should be imported into another script.')
 	print('By Mohammed Gasim.')
-	x = StockAV('tsla', key = 'XUPW4RL3WF2RVXFY')
-	print(x.by_year())
